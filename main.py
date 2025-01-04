@@ -79,8 +79,6 @@ def evaluate_metrics(epoch: int, model: nn.Module, dataloader: DataLoader) -> di
     return scores
 
 def save_checkpoint(dict_to_save: dict, checkpoint_path: str):
-    if not os.path.isdir(checkpoint_path):
-        os.mkdir(checkpoint_path)
     torch.save(dict_to_save, os.path.join(f"{checkpoint_path}", "last_model.pth"))
 
 def main(
@@ -102,6 +100,8 @@ def main(
         train_path, dev_path, test_path
     )
     # Lưu vocab
+    if not os.path.isdir(checkpoint_path):
+        os.mkdir(checkpoint_path)
     vocab_path = os.path.join(checkpoint_path, "vocab.pkl")
     with open(vocab_path, "wb") as f:
         pickle.dump(vocab, f)
