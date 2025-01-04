@@ -7,6 +7,7 @@ from shutil import copyfile
 from tqdm import tqdm
 from sklearn.metrics import precision_score, recall_score, f1_score
 import argparse
+import wandb
 
 from vocab import Vocab
 from dataset import ViOCD_Dataset, collate_fn
@@ -148,14 +149,30 @@ def main(
     while True:
         train(epoch, model, train_dataloader, optim)
         # val scores
-        scores = evaluate_metrics(epoch, model, dev_dataloader)
-        print(f"Dev scores: {scores}")
-        score = scores[score_name]
+        train_scores = evaluate_metrics(epoch, model, train_dataloader)
+        print(f"Train scores: {train_scores}")
+        dev_scores = evaluate_metrics(epoch, model, dev_dataloader)
+        print(f"Dev scores: {dev_scores}")
+        test_scores = evaluate_metrics(epoch, model, test_dataloader)
+        print(f"Test scores: {test_scores}")
+        dev_score = dev_scores[score_name]
+
+        wandb.log({
+            "train/f1":train_scores["f1"],
+            "train/precision":train_scores["precision"],
+            "train/recall":train_scores["recall"],
+            "dev/f1":dev_scores["f1"],
+            "dev/precision":dev_scores["precision"],
+            "dev/recall":dev_scores["recall"],
+            "test/f1":test_scores["f1"],
+            "test/precision":test_scores["precision"],
+            "test/recall":test_scores["recall"],
+        })
 
         # Prepare for next epoch
         is_the_best_model = False
-        if score > best_score:
-            best_score = score
+        if dev_score > best_score:
+            best_score = dev_score
             patience = 0
             is_the_best_model = True
         else:
@@ -202,8 +219,13 @@ if __name__ == "__main__":
     parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="Checkpoint directory")
     parser.add_argument("--positional_encoding", type=str, choices=["sinusoidal", "learned"], default="sinusoidal", help="Type of positional encoding")
     parser.add_argument("--model_type", type=str, choices=["custom", "pytorch"], default="pytorch", help="Model type to use")
+    parser.add_argument('--wandb', default='disabled', type=str)
     
     args = parser.parse_args()
+
+    wandb.init(project='transformer_text_classification',
+               config=args,
+               mode=args.wandb)
     
     main(
         d_model=args.d_model,
