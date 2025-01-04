@@ -1,10 +1,24 @@
 import torch
+import numpy as np
+import random
 from torch import nn
 from vocab import Vocab
 
+def set_seed(seed: int):
+    """Set random seed for reproducibility."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # Nếu bạn sử dụng multi-GPU
+    torch.backends.cudnn.deterministic = True  # Đảm bảo kết quả tái lập lại (chậm hơn)
+    torch.backends.cudnn.benchmark = False
+
 class PyTorchTransformerEncoderModel(nn.Module):
-    def __init__(self, d_model: int, head: int, n_layer: int, d_ff: int, dropout: float, vocab: Vocab):
+    def __init__(self, d_model: int, head: int, n_layer: int, d_ff: int, dropout: float, vocab: Vocab, seed: int):
         super().__init__()
+
+        set_seed(seed)
 
         self.vocab = vocab
         self.embedding = nn.Embedding(vocab.total_tokens, d_model)

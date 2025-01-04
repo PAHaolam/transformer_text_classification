@@ -95,7 +95,8 @@ def main(
         learning_rate: float = 0.001,
         checkpoint_path: str = "checkpoints",
         positional_encoding: str = "sinusoidal",
-        model_type: str = "pytorch"
+        model_type: str = "pytorch",
+        seed: int = 42
     ):
     vocab = Vocab(
         train_path, dev_path, test_path
@@ -144,7 +145,7 @@ def main(
         ).to(device)
     elif model_type == "pytorch":
         model = PyTorchTransformerEncoderModel(
-            d_model, head, layer_dim, d_ff, dropout, vocab
+            d_model, head, layer_dim, d_ff, dropout, vocab, seed
         ).to(device)
     else:
         raise ValueError(f"Unsupported model_type: {model_type}")
@@ -225,6 +226,7 @@ if __name__ == "__main__":
     parser.add_argument("--positional_encoding", type=str, choices=["sinusoidal", "learned"], default="sinusoidal", help="Type of positional encoding")
     parser.add_argument("--model_type", type=str, choices=["custom", "pytorch"], default="pytorch", help="Model type to use")
     parser.add_argument('--wandb', default='disabled', type=str)
+    parser.add_argument("--seed", type=int, default=42, help="Seed for reproducibility")
     
     args = parser.parse_args()
 
@@ -242,7 +244,8 @@ if __name__ == "__main__":
         dev_path=args.dev_path,
         test_path=args.test_path,
         learning_rate=args.learning_rate,
-        checkpoint_path=args.checkpoint_path,
+        checkpoint_path=f"{args.checkpoint_path}_seed_{args.seed}",
         positional_encoding=args.positional_encoding,
-        model_type=args.model_type  # Truyền model_type
+        model_type=args.model_type,  # Truyền model_type
+        seed=args.seed
     )
