@@ -8,6 +8,7 @@ from tqdm import tqdm
 from sklearn.metrics import precision_score, recall_score, f1_score
 import argparse
 import wandb
+import pickle
 
 from vocab import Vocab
 from dataset import ViOCD_Dataset, collate_fn
@@ -99,6 +100,10 @@ def main(
     vocab = Vocab(
         train_path, dev_path, test_path
     )
+    # Lưu vocab
+    vocab_path = os.path.join(checkpoint_path, "vocab.pkl")
+    with open(vocab_path, "wb") as f:
+        pickle.dump(vocab, f)
 
     train_dataset = ViOCD_Dataset(train_path, vocab)
     dev_dataset = ViOCD_Dataset(dev_path, vocab)
