@@ -47,10 +47,6 @@ def evaluate_metrics(model: torch.nn.Module, dataloader: DataLoader) -> dict:
 
     return compute_scores(all_predictions, all_labels)
 
-def load_checkpoint(checkpoint_path: str, model: torch.nn.Module):
-    checkpoint = torch.load(os.path.join(checkpoint_path, "last_model.pth"), map_location=device)
-    model.load_state_dict(checkpoint["state_dict"])
-
 def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
     # Load vocab
     vocab_path = os.path.join(checkpoint_path, "vocab.pkl")
@@ -87,32 +83,25 @@ def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
         collate_fn=collate_fn
     )
 
-    # Load models
-    model = PyTorchTransformerEncoderModel(
-        d_model=512, head=8, layer_dim=3, d_ff=4096, dropout=0.1, vocab=vocab, seed=42
-    ).to(device)
-
     best_model_path = os.path.join(checkpoint_path, "best_model.pth")
     if os.path.exists(best_model_path):
         print("Loading best model...")
-        best_checkpoint = torch.load(best_model_path, map_location=device)
-        model.load_state_dict(best_checkpoint)
+        best_model = torch.load(best_model_path).to(device)
         print("Evaluating best model:")
-        print("Train scores:", evaluate_metrics(model, train_dataloader))
-        print("Dev scores:", evaluate_metrics(model, dev_dataloader))
-        print("Test scores:", evaluate_metrics(model, test_dataloader))
+        print("Train scores:", evaluate_metrics(best_model, train_dataloader))
+        print("Dev scores:", evaluate_metrics(best_model, dev_dataloader))
+        print("Test scores:", evaluate_metrics(best_model, test_dataloader))
     else:
         print("Best model not found.")
 
     last_model_path = os.path.join(checkpoint_path, "last_model.pth")
     if os.path.exists(last_model_path):
         print("Loading last model...")
-        last_checkpoint = torch.load(last_model_path, map_location=device)
-        model.load_state_dict(last_checkpoint["state_dict"])
+        last_model = torch.load(last_model_path).to(device)
         print("Evaluating last model:")
-        print("Train scores:", evaluate_metrics(model, train_dataloader))
-        print("Dev scores:", evaluate_metrics(model, dev_dataloader))
-        print("Test scores:", evaluate_metrics(model, test_dataloader))
+        print("Train scores:", evaluate_metrics(last_model, train_dataloader))
+        print("Dev scores:", evaluate_metrics(last_model, dev_dataloader))
+        print("Test scores:", evaluate_metrics(last_model, test_dataloader))
     else:
         print("Last model not found.")
 
