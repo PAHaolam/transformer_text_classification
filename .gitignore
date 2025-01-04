@@ -4,8 +4,8 @@ __pycache__/
 
 nothing.py
 
-checkpoints/
+checkpoints*/
 
 custom_transformer/
 
-Report Template of Mini-Project about Transformer.zip
+*.zip

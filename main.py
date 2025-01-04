@@ -12,7 +12,7 @@ import pickle
 
 from vocab import Vocab
 from dataset import ViOCD_Dataset, collate_fn
-from transformer_encoder_model import TransformerEncoderModel
+#from transformer_encoder_model import TransformerEncoderModel
 from Pytorch_transformer_model import PyTorchTransformerEncoderModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -139,10 +139,11 @@ def main(
 
     # Tạo mô hình dựa trên `model_type`
     if model_type == "custom":
-        use_learned_positional_encoding = (positional_encoding.lower() == "learned")
-        model = TransformerEncoderModel(
-            d_model, head, layer_dim, d_ff, dropout, vocab, use_learned_positional_encoding=use_learned_positional_encoding
-        ).to(device)
+        # use_learned_positional_encoding = (positional_encoding.lower() == "learned")
+        # model = TransformerEncoderModel(
+        #     d_model, head, layer_dim, d_ff, dropout, vocab, use_learned_positional_encoding=use_learned_positional_encoding
+        # ).to(device)
+        raise ValueError(f"model_type {model_type} is coming soon")
     elif model_type == "pytorch":
         model = PyTorchTransformerEncoderModel(
             d_model, head, layer_dim, d_ff, dropout, vocab, seed
