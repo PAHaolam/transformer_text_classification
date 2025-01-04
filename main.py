@@ -85,7 +85,7 @@ def main(
         d_model: int = 512,
         layer_dim: int = 3,
         head: int = 8,
-        d_ff: int = 4086,
+        d_ff: int = 4096,
         dropout: float = 0.1,
         train_path: str = "UIT-ViOCD/train.json", 
         dev_path: str = "UIT-ViOCD/dev.json", 
@@ -93,7 +93,7 @@ def main(
         learning_rate: float = 0.001,
         checkpoint_path: str = "checkpoints",
         positional_encoding: str = "sinusoidal",
-        model_type: str = "custom"
+        model_type: str = "pytorch"
     ):
     vocab = Vocab(
         train_path, dev_path, test_path
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument("--d_model", type=int, default=512, help="Model dimension")
     parser.add_argument("--layer_dim", type=int, default=3, help="Number of layers")
     parser.add_argument("--head", type=int, default=8, help="Number of attention heads")
-    parser.add_argument("--d_ff", type=int, default=4086, help="Feed-forward dimension")
+    parser.add_argument("--d_ff", type=int, default=4096, help="Feed-forward dimension")
     parser.add_argument("--dropout", type=float, default=0.1, help="Dropout rate")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate")
     parser.add_argument("--train_path", type=str, default="UIT-ViOCD/train.json", help="Path to the training dataset")
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_path", type=str, default="UIT-ViOCD/test.json", help="Path to the test dataset")
     parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="Checkpoint directory")
     parser.add_argument("--positional_encoding", type=str, choices=["sinusoidal", "learned"], default="sinusoidal", help="Type of positional encoding")
-    parser.add_argument("--model_type", type=str, choices=["custom", "pytorch"], default="custom", help="Model type to use")
+    parser.add_argument("--model_type", type=str, choices=["custom", "pytorch"], default="pytorch", help="Model type to use")
     
     args = parser.parse_args()
     
