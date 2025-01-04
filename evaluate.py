@@ -48,10 +48,14 @@ def evaluate_metrics(model: torch.nn.Module, dataloader: DataLoader) -> dict:
     return compute_scores(all_predictions, all_labels)
 
 def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
+    # Load models
+    hyper_params_path = os.path.join(checkpoint_path, "hyper_params.pth")
+    hyper_params = torch.load(hyper_params_path)
+
     # Create datasets and dataloaders
-    train_dataset = ViOCD_Dataset(train_path, vocab)
-    dev_dataset = ViOCD_Dataset(dev_path, vocab)
-    test_dataset = ViOCD_Dataset(test_path, vocab)
+    train_dataset = ViOCD_Dataset(train_path, hyper_params["vocab"])
+    dev_dataset = ViOCD_Dataset(dev_path, hyper_params["vocab"])
+    test_dataset = ViOCD_Dataset(test_path, hyper_params["vocab"])
 
     train_dataloader = DataLoader(
         dataset=train_dataset,
@@ -75,9 +79,6 @@ def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
         collate_fn=collate_fn
     )
 
-    # Load models
-    hyper_params_path = os.path.join(checkpoint_path, "hyper_params.pth")
-    hyper_params = torch.load(hyper_params_path)
     if hyper_params["mode_type"] == "pytorch":
         model = PyTorchTransformerEncoderModel(
             d_model=hyper_params["d_model"], 
