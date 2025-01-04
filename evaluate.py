@@ -48,14 +48,6 @@ def evaluate_metrics(model: torch.nn.Module, dataloader: DataLoader) -> dict:
     return compute_scores(all_predictions, all_labels)
 
 def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
-    # Load vocab
-    vocab_path = os.path.join(checkpoint_path, "vocab.pkl")
-    if not os.path.exists(vocab_path):
-        raise FileNotFoundError(f"Vocab file not found at {vocab_path}")
-
-    with open(vocab_path, "rb") as f:
-        vocab = pickle.load(f)
-
     # Create datasets and dataloaders
     train_dataset = ViOCD_Dataset(train_path, vocab)
     dev_dataset = ViOCD_Dataset(dev_path, vocab)
@@ -84,9 +76,20 @@ def main(checkpoint_path: str, train_path: str, dev_path: str, test_path: str):
     )
 
     # Load models
-    model = PyTorchTransformerEncoderModel(
-        d_model=512, head=8, n_layer=3, d_ff=4096, dropout=0.1, vocab=vocab, seed=42
-    ).to(device)
+    hyper_params_path = os.path.join(checkpoint_path, "hyper_params.pth")
+    hyper_params = torch.load(hyper_params_path)
+    if hyper_params["mode_type"] == "pytorch":
+        model = PyTorchTransformerEncoderModel(
+            d_model=hyper_params["d_model"], 
+            head=hyper_params["head"], 
+            n_layer=hyper_params["layer_dim"], 
+            d_ff=hyper_params["d_ff"], 
+            dropout=hyper_params["dropout"], 
+            vocab=hyper_params["vocab"], 
+            seed=hyper_params["seed"]
+        ).to(device)
+    else:
+        raise ValueError(f"Unsupported model_type: {hyper_params['mode_type']}")
 
     best_model_path = os.path.join(checkpoint_path, "best_model.pth")
     if os.path.exists(best_model_path):

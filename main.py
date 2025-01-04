@@ -144,9 +144,10 @@ def main(
         model = PyTorchTransformerEncoderModel(
             d_model, head, layer_dim, d_ff, dropout, vocab, seed
         ).to(device)
-        
+
         #Save hyper parameters
         config = {
+            "mode_type": model_type,
             "vocab": vocab,
             "d_model": d_model,
             "layer_dim": layer_dim,
