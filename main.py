@@ -78,8 +78,10 @@ def evaluate_metrics(epoch: int, model: nn.Module, dataloader: DataLoader) -> di
 
     return scores
 
-def save_checkpoint(dict_to_save: dict, checkpoint_path: str):
-    torch.save(dict_to_save, os.path.join(f"{checkpoint_path}", "last_model.pth"))
+def save_checkpoint(dict_to_save: dict, checkpoint_path: str, file_name: str = "last_model.pth"):
+    if not os.path.isdir(checkpoint_path):
+        os.mkdir(checkpoint_path)
+    torch.save(dict_to_save, os.path.join(f"{checkpoint_path}", file_name))
 
 def main(
         d_model: int = 512,
@@ -99,12 +101,6 @@ def main(
     vocab = Vocab(
         train_path, dev_path, test_path
     )
-    # Lưu vocab
-    if not os.path.isdir(checkpoint_path):
-        os.mkdir(checkpoint_path)
-    vocab_path = os.path.join(checkpoint_path, "vocab.pkl")
-    with open(vocab_path, "wb") as f:
-        pickle.dump(vocab, f)
 
     train_dataset = ViOCD_Dataset(train_path, vocab)
     dev_dataset = ViOCD_Dataset(dev_path, vocab)
@@ -148,6 +144,18 @@ def main(
         model = PyTorchTransformerEncoderModel(
             d_model, head, layer_dim, d_ff, dropout, vocab, seed
         ).to(device)
+        
+        #Save hyper parameters
+        config = {
+            "vocab": vocab,
+            "d_model": d_model,
+            "layer_dim": layer_dim,
+            "head": head,
+            "d_ff": d_ff,
+            "dropout": dropout,
+            "seed": seed,
+        }
+        save_checkpoint(config, checkpoint_path, "hyper_params.pth")
     else:
         raise ValueError(f"Unsupported model_type: {model_type}")
 
