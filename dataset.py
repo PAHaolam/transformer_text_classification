@@ -18,7 +18,7 @@ def collate_fn(items: list[dict]) -> dict:
     batch_labels = []
     for item in items:
         input_ids = item["input_ids"]
-        input_ids = pad_value(input_ids, value=0, max_length=max_len)
+        input_ids = pad_value(input_ids, value=2, max_length=max_len)
         batch_input_ids.append(input_ids.unsqueeze(0))
 
         labels = item["label"]
